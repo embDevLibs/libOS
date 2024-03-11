@@ -31,6 +31,29 @@
  * for seconds, milliseconds and microseconds however have to be
  * signed arithmetic types (aka int, int32_t, etc.). This is
  * required because the difference calculation can be negative.
+ * 
+ * If the platform provides library functions they should be enclosed in 
+ * a extern "C" block like: 
+ * 
+ * @code 
+ * #ifdef __cplusplus
+ * extern "C" {
+ * #endif // __cplusplus
+ * 
+ * // Functions
+ * 
+ * #ifdef __cplusplus
+ * }
+ * #endif // __cplusplus
+ * 
+ * @endcode
+ * 
+ * Or, if it does not have a block, each function should be marked as 
+ * @code
+ * extern "C"
+ * @endcode
+ * . The general API header for the time places all the functions in
+ * a extern "C" code block.
  */
 
 #pragma once
@@ -42,6 +65,10 @@
 
 // Platform specific additions & provisions like the libos_time_*_t types.
 #include "libos/platform/time.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
 
 /**
  * @brief Retrieves the current time in libos_time_t format.
@@ -186,5 +213,9 @@ bool libos_time_is_earlier(libos_time_t a, libos_time_t b);
  * @retval false If @ref a is NOT the same as @ref b.
  */
 bool libos_time_is_same(libos_time_t a, libos_time_t b);
+
+#ifdef __cplusplus
+}
+#endif // __cplusplus
 
 #endif // LIBOS_TIME_H
