@@ -1,5 +1,6 @@
 set(STDLIB_SRCS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/time.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/log.c"
 )
 
 add_library(libOS-platform STATIC "${STDLIB_SRCS}")
