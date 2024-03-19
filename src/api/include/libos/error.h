@@ -64,6 +64,8 @@
 #ifndef LIBOS_ERROR_H
 #define LIBOS_ERROR_H
 
+#include <stddef.h>
+
 #include "libos/platform/error.h"
 
 // Error handling
