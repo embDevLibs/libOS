@@ -18,4 +18,7 @@ typedef int libos_err_t;
 #define LIBOS_ERR_BUSY ((libos_err_t)EBUSY)
 #define LIBOS_ERR_TIMEOUT ((libos_err_t)ETIMEDOUT)
 
+// Non POSIX standard error codes
+#define LIBOS_ERR_INVALID_STATE ((libos_err_t)-2) // POSIX requires error codes to be positive anyway, and -1 is often general purpose 'error'.
+
 #endif // LIBOS_PLATFORM_ERROR_H

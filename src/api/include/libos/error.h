@@ -26,6 +26,7 @@
  * * LIBOS_ERR_NOTSUP
  * * LIBOS_ERR_BUSY
  * * LIBOS_ERR_TIMEOUT
+ * * LIBOS_ERR_INVALID_STATE 
  * 
  * Any additional helper macros can be defined but ideally should be
  * up-streamed to the general API if they are OS & platform independent.
