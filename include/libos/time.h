@@ -10,7 +10,7 @@
  * to the time since boot. The application using this module 
  * should not make any assumptions about this.
  * 
- * While specific types lib libos_time_milliseconds_t are
+ * While specific types like libos_time_milliseconds_t are
  * provided, it is generally recommended to use the libos_time_t
  * to represent time. This will allow libos_time_* to be able
  * to directly operate on it, make consumption by other
@@ -25,15 +25,17 @@
  *  * libos_time_seconds_t
  *  * libos_time_milliseconds_t
  *  * libos_time_microseconds_t
+ *  * libos_time_nanoseconds_t
  * 
  * libos_time_t is implementation specific and is allowed to be 
  * anything from a int to struct with complex members. The types
- * for seconds, milliseconds and microseconds however have to be
- * signed arithmetic types (aka int, int32_t, etc.). This is
- * required because the difference calculation can be negative.
+ * for seconds, milliseconds, microseconds, and nanoseconds however
+ * have to be signed arithmetic types (aka int, int32_t, etc.).
+ * This is required because the difference calculation can be
+ * negative.
  * 
- * If the platform provides library functions they should be enclosed in 
- * a extern "C" block like: 
+ * If the platform provides library functions they should be enclosed
+ * in a extern "C" block like: 
  * 
  * @code 
  * #ifdef __cplusplus
@@ -78,6 +80,16 @@ extern "C" {
 libos_time_t libos_time_get_now(void);
 
 /**
+ * @brief Returns the difference between the two times in nanoseconds.
+ * 
+ * @param a The time to use as a baseline.
+ * @param b The time to get the difference to.
+ * 
+ * @return libos_time_microseconds_t Returns the time difference in nanoseconds in the platform specific value type.
+ */
+libos_time_nanoseconds_t libos_time_difference_ms(libos_time_t a, libos_time_t b);
+
+/**
  * @brief Returns the difference between the two times in microseconds.
  * 
  * @param a The time to use as a baseline.
@@ -108,6 +120,15 @@ libos_time_milliseconds_t libos_time_difference_ms(libos_time_t a, libos_time_t 
 libos_time_seconds_t libos_time_difference_s(libos_time_t a, libos_time_t b);
 
 /**
+ * @brief Creates a libos_time_t structure from just the number of nanoseconds since the epoch.
+ * 
+ * @param ns The nanoseconds component.
+ * 
+ * @return libos_time_t The resulting time structure.
+ */
+libos_time_t libos_time_from_ns(libos_time_nanoseconds_t ns);
+
+/**
  * @brief Creates a libos_time_t structure from just the number of microseconds since the epoch.
  * 
  * @param us The microseconds component.
@@ -135,13 +156,22 @@ libos_time_t libos_time_from_ms(libos_time_milliseconds_t ms);
 libos_time_t libos_time_from_s(libos_time_seconds_t s);
 
 /**
- * @brief Convert the timestamp to the number of seconds since it's epoch.
+ * @brief Converts the timestamp to the number of nanoseconds since it's epoch.
  * 
  * @param time The time to convert.
  * 
- * @return libos_time_seconds_t The number of seconds since the epoch.
+ * @return libos_time_nanoseconds_t The number of nanoseconds since the epoch.
  */
-libos_time_seconds_t libos_time_to_s(libos_time_t time);
+libos_time_nanoseconds_t libos_time_to_ns(libos_time_t time);
+
+/**
+ * @brief Converts the timestamp to the number of microsecond since it's epoch.
+ * 
+ * @param time The time to convert.
+ * 
+ * @return libos_time_microseconds_t The number of microseconds since the epoch.
+ */
+libos_time_microseconds_t libos_time_to_us(libos_time_t time);
 
 /**
  * @brief Converts the timestamp to the number of millisecond since it's epoch
@@ -153,13 +183,13 @@ libos_time_seconds_t libos_time_to_s(libos_time_t time);
 libos_time_milliseconds_t libos_time_to_ms(libos_time_t time);
 
 /**
- * @brief Converts the timestamp to the number of microsecond since it's epoch.
+ * @brief Convert the timestamp to the number of seconds since it's epoch.
  * 
  * @param time The time to convert.
  * 
- * @return libos_time_microseconds_t The number of microseconds since the epoch.
+ * @return libos_time_seconds_t The number of seconds since the epoch.
  */
-libos_time_microseconds_t libos_time_to_us(libos_time_t time);
+libos_time_seconds_t libos_time_to_s(libos_time_t time);
 
 /**
  * @brief Subtracts @ref b from the @ref a timestamp.
