@@ -18,6 +18,9 @@
  * is the user of the mutex to ensure no recursive lock are done mutexes that
  * may or may not be recursive.
  * 
+ * This header also provides some convience macros to deal with initializing
+ * mutexes while supporting both static and dynamic allocations.
+ * 
  * 
  * IMPLEMENTORS:
  * For the implementor it is required to provide a
@@ -36,9 +39,9 @@
  * implementation needs to differentiate between them, this needs be handled
  * internally.
  * 
- * The header provides the LIBOS_MUTEX_ENABLE_STATIC_ALLOCATION and
- * LIBOS_MUTEX_ENABLE_DYNAMIC_ALLOCATION macros. If their value is defined to
- * 1 then the allocation method is supported. If defined to anything else it
+ * The header implementation provides the LIBOS_MUTEX_ENABLE_STATIC_ALLOCATION
+ * and LIBOS_MUTEX_ENABLE_DYNAMIC_ALLOCATION macros. If their value is defined
+ * to 1 then the allocation method is supported. If defined to anything else it
  * means not supported. In case the header fails to define them, they will
  * default to 0. A implementation must at least provide 1 initialization
  * method. Providing neither will result in a compile time error.
@@ -94,6 +97,102 @@
 #if LIBOS_MUTEX_ENABLE_DYNAMIC_ALLOCATION!=1 && LIBOS_MUTEX_ENABLE_STATIC_ALLOCATION!=1
 #error "The platform doesn't provide either a static or dynamic initialization method for mutexes. How are you suppose to initialize mutexes?"
 #endif // LIBOS_MUTEX_ENABLE_DYNAMIC_ALLOCATION!=1 && LIBOS_MUTEX_ENABLE_STATIC_ALLOCATION!=1
+
+/**
+ * @def LIBOS_MUTEX_STATIC_DATA_STRUCT(name)
+ * @brief Define a variable of libos_mutex_t with @ref name if static allocation is supported
+ * 
+ * Example:
+ * @code{.c}
+ * struct a {
+ *   int ab;
+ *   LIBOS_MUTEX_STATIC_DATA_STRUCT(mutex_data);
+ * }
+ * @endcode
+ * 
+ * Example:
+ * @code{.c}
+ * void ab(void) {
+ *  LIBOS_MUTEX_STATIC_DATA_STRUCT(mutex_data);
+ *  // do stuff
+ * }
+ * @endcode
+ * 
+ * @param[in] name The name of of the variable if defined.
+ */
+
+#if LIBOS_MUTEX_ENABLE_STATIC_ALLOCATION==1
+#define LIBOS_MUTEX_STATIC_DATA_STRUCT(name) libos_mutex_t name
+#else // LIBOS_MUTEX_ENABLE_STATIC_ALLOCATION==1
+// Don't define struct
+#define LIBOS_MUTEX_STATIC_DATA_STRUCT(static_data_name)
+#endif // LIBOS_MUTEX_ENABLE_STATIC_ALLOCATION==1
+
+/**
+ * @def LIBOS_MUTEX_CREATE_PREFER_STATIC(static_data_name, handle)
+ * @brief Call libos_mutex_create_static if static allocation is supported, otherwise call libos_mutex_create_dynamic.
+ * 
+ * @details
+ * Conditional implementation for when static allocation is supported or not.
+ * The parameter are names for the variables, they are NOT pointers yet.
+ * 
+ * Example:
+ * @code{.c}
+ * LIBOS_MUTEX_STATIC_DATA_STRUCT(static_mutex);
+ * libos_mutex_handle_t handle;
+ * 
+ * if (LIBOS_MUTEX_CREATE_PREFER_STATIC(static_mutex, handle) != LIBOS_ERR_OK)
+ * {
+ *   // Do stuff
+ * }
+ * @endcode
+ * 
+ * 
+ * @param[in] static_data_name The name of of the variable for the static data struct.
+ * @param[in] handle The name of the variable to place the resulting handle in.
+ */
+#if LIBOS_MUTEX_ENABLE_STATIC_ALLOCATION==1
+#define LIBOS_MUTEX_CREATE_PREFER_STATIC(static_data_name, handle) libos_mutex_create_static(&(static_data_name),&(handle))
+#else // LIBOS_MUTEX_ENABLE_STATIC_ALLOCATION==1
+#define LIBOS_MUTEX_CREATE_PREFER_STATIC(static_data_name, handle) libos_mutex_create_dynamic(&(handle))
+#endif // LIBOS_MUTEX_ENABLE_STATIC_ALLOCATION==1
+
+/**
+ * @def LIBOS_MUTEX_CREATE_RECURSIVE_PREFER_STATIC(static_data_name, handle)
+ * @brief Call libos_mutex_create_recursive_static if static allocation is supported, otherwise call libos_mutex_create_recursive_dynamic.
+ * 
+ * @details
+ * Conditional implementation for when static allocation is supported or not.
+ * The parameter are names for the variables, they are NOT pointers yet.
+ * 
+ * Example:
+ * @code{.c}
+ * LIBOS_MUTEX_STATIC_DATA_STRUCT(static_mutex);
+ * libos_mutex_handle_t handle;
+ * 
+ * if (LIBOS_MUTEX_CREATE_RECURSIVE_PREFER_STATIC(static_mutex, handle) != LIBOS_ERR_OK)
+ * {
+ *   // Do stuff
+ * }
+ * @endcode
+ * 
+ * 
+ * @param[in] static_data_name The name of of the variable for the static data struct.
+ * @param[in] handle The name of the variable to place the resulting handle in.
+ */
+
+#if LIBOS_MUTEX_ENABLE_RECURSIVE==1
+    #if LIBOS_MUTEX_ENABLE_STATIC_ALLOCATION==1
+    #define LIBOS_MUTEX_CREATE_RECURSIVE_PREFER_STATIC(static_data_name, handle) libos_mutex_create_recursive_static(&(static_data_name),&(handle))
+    #else // LIBOS_MUTEX_ENABLE_STATIC_ALLOCATION==1
+    #define LIBOS_MUTEX_CREATE_RECURSIVE_PREFER_STATIC(static_data_name, handle) libos_mutex_create_recursive_dynamic(&(handle))
+    #endif // LIBOS_MUTEX_ENABLE_STATIC_ALLOCATION==1
+#else // LIBOS_MUTEX_ENABLE_RECURSIVE==1
+    #ifdef _DOXYGEN_
+    #define LIBOS_MUTEX_CREATE_RECURSIVE_PREFER_STATIC(static_data_name, handle)
+    #endif // _DOXYGEN_
+    // Not supported, so don't define so it gives a compile error when not generating doxygen.
+#endif // LIBOS_MUTEX_ENABLE_RECURSIVE==1
 
 /**
  * @brief Attempts to lock the mutex within the given time.
@@ -165,29 +264,32 @@ libos_err_t libos_mutex_create_recursive_dynamic(libos_mutex_handle_t *handle);
 /**
  * @brief Initializes the given mutex.
  * 
- * @param[out] handle The handle to the mutex to initialize.
+ * @param[in] mutex The data structure for mutex.
+ * @param[out] handle The handle to the mutex.
  * 
  * @retval LIBOS_ERR_OK The mutex is successfully created.
- * @retval LIBOS_ERR_INVALID_ARG @ref handle is NULL.
+ * @retval LIBOS_ERR_INVALID_ARG @ref mutex and/or @ref handle is NULL.
  * @retval LIBOS_ERR_FAIL In case of platform specific faults.
  * 
  * @return libos_err_t The libos standard success code for initialing the mutex.
  */
-libos_err_t libos_mutex_create_static(libos_mutex_handle_t handle);
+libos_err_t libos_mutex_create_static(libos_mutex_t *mutex, libos_mutex_handle_t *handle);
 
 #if LIBOS_MUTEX_ENABLE_RECURSIVE==1
+
 /**
  * @brief Initializes the given mutex as a recursive mutex.
  * 
- * @param[out] handle The handle to the mutex to initialize.
+ * @param[in] mutex The data structure for mutex.
+ * @param[out] handle The handle to the mutex.
  * 
  * @retval LIBOS_ERR_OK The mutex is successfully created.
- * @retval LIBOS_ERR_INVALID_ARG @ref handle is NULL.
+ * @retval LIBOS_ERR_INVALID_ARG @ref mutex and/or @ref handle is NULL.
  * @retval LIBOS_ERR_FAIL In case of platform specific faults.
  * 
  * @return libos_err_t The libos standard success code for initialing the recursive mutex.
  */
-libos_err_t libos_mutex_create_recursive_static(libos_mutex_handle_t handle);
+libos_err_t libos_mutex_create_recursive_static(libos_mutex_t *mutex, libos_mutex_handle_t *handle);
 
 #endif // LIBOS_MUTEX_ENABLE_RECURSIVE==1
 
@@ -196,7 +298,7 @@ libos_err_t libos_mutex_create_recursive_static(libos_mutex_handle_t handle);
 /**
  * @brief Deletes the previously initialized mutex (and deallocates if dynamic).
  * 
- * @param handle The mutex to delete.
+ * @param[in] handle The mutex to delete.
  */
 void libos_mutex_delete(libos_mutex_handle_t handle);
 
