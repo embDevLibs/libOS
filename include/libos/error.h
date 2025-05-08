@@ -69,12 +69,16 @@
 
 #include "libos/platform/error.h"
 
-// Error handling
+// ================================================
+//
+// Error handling that returns error codes.
+//
+// ================================================
 
 #ifndef LIBOS_ERR_RET_ARG_IN_RANGE
 
 /**
- * @brief Checks if the argument is within the given range and function returns LIBOS_ERR_INVALID_ARG if it isn't
+ * @brief Checks if the argument is within the given range and function returns LIBOS_ERR_INVALID_ARG if it isn't.
  * 
  * @param value The value to do the range check on (WARNING: multiple evaluation of this are happening within the macro).
  * @param range_min The minimum number @ref value has to be (inclusive).
@@ -89,7 +93,7 @@
  * @brief Checks if the argument is not null, and if it is, return LIBOS_ERR_INVALID_ARG.
  * 
  * @details
- * This function should be specifically used for arguments that are already given. If you 
+ * This function should be specifically used for arguments that are already given. If you
  * want to check a memory allocation from something like malloc(), use
  * @ref LIBOS_ERR_RET_MEMORY_NOT_NULL.
  * 
@@ -121,5 +125,61 @@
  */
 #define LIBOS_ERR_RET_ON_TRUE(condition, ret) do { if ((condition)) { return (ret); }} while(0)
 #endif // LIBOS_ERR_RET_ON_TRUE
+
+// ================================================
+//
+// Error handling that just returns (for void).
+//
+// ================================================
+
+#ifndef LIBOS_ERR_RET_VOID_ARG_IN_RANGE
+
+/**
+ * @brief Checks if the argument is within the given range and function returns if it isn't.
+ * 
+ * @param value The value to do the range check on (WARNING: multiple evaluation of this are happening within the macro).
+ * @param range_min The minimum number @ref value has to be (inclusive).
+ * @param range_max The maximum number @ref value can be (inclusive).
+ */
+#define LIBOS_ERR_RET_VOID_ARG_IN_RANGE(value, range_min, range_max) LIBOS_ERR_RET_VOID_ON_TRUE(((value) < (range_min) || (value) > (range_max)))
+#endif // LIBOS_ERR_RET_VOID_ARG_IN_RANGE
+
+#ifndef LIBOS_ERR_RET_VOID_ARG_NOT_NUL
+
+/**
+ * @brief Checks if the argument is not null, and if it is, returns.
+ * 
+ * @details
+ * This function should be specifically used for arguments that are already given. If you 
+ * want to check a memory allocation from something like malloc(), use
+ * @ref LIBOS_ERR_RET_VOID_MEMORY_NOT_NULL.
+ * 
+ * @param arg The expression to evaluate and check if it is NULL or not.
+ */
+#define LIBOS_ERR_RET_VOID_ARG_NOT_NUL(arg) LIBOS_ERR_RET_VOID_ON_TRUE((arg) == NULL)
+#endif // LIBOS_ERR_RET_VOID_ARG_NOT_NUL
+
+#ifndef LIBOS_ERR_RET_VOID_MEMORY_NOT_NUL
+
+/**
+ * @brief Checks if the pointer is NULL or not; if it is, returns.
+ * 
+ * @details
+ * This check should be used when the given argument is a pointer just returned from a function like malloc().
+ * 
+ * @param ptr The value to check for NULL
+ */
+#define LIBOS_ERR_RET_VOID_MEMORY_NOT_NUL(ptr) LIBOS_ERR_RET_VOID_ON_TRUE(((ptr) == NULL))
+#endif // LIBOS_ERR_RET_VOID_MEMORY_NOT_NUL
+
+#ifndef LIBOS_ERR_RET_VOID_ON_TRUE
+
+/**
+ * @brief Returns if the @ref condition evaluates to true.
+ * 
+ * @param condition The expression to evaluate.
+ */
+#define LIBOS_ERR_RET_VOID_ON_TRUE(condition) do { if ((condition)) { return; }} while(0)
+#endif // LIBOS_ERR_RET_VOID_ON_TRUE
 
 #endif // LIBOS_ERROR_H
