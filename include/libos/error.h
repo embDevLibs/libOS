@@ -87,7 +87,7 @@
 #define LIBOS_ERR_RET_ARG_IN_RANGE(value, range_min, range_max) LIBOS_ERR_RET_ON_TRUE(((value) < (range_min) || (value) > (range_max)), LIBOS_ERR_INVALID_ARG)
 #endif // LIBOS_ERR_RET_ARG_IN_RANGE
 
-#ifndef LIBOS_ERR_RET_ARG_NOT_NUL
+#ifndef LIBOS_ERR_RET_ARG_NOT_NULL
 
 /**
  * @brief Checks if the argument is not null, and if it is, return LIBOS_ERR_INVALID_ARG.
@@ -99,10 +99,10 @@
  * 
  * @param arg The expression to evaluate and check if it is NULL or not.
  */
-#define LIBOS_ERR_RET_ARG_NOT_NUL(arg) LIBOS_ERR_RET_ON_TRUE((arg) == NULL, LIBOS_ERR_INVALID_ARG)
-#endif // LIBOS_ERR_RET_ARG_NOT_NUL
+#define LIBOS_ERR_RET_ARG_NOT_NULL(arg) LIBOS_ERR_RET_ON_TRUE((arg) == NULL, LIBOS_ERR_INVALID_ARG)
+#endif // LIBOS_ERR_RET_ARG_NOT_NULL
 
-#ifndef LIBOS_ERR_RET_MEMORY_NOT_NUL
+#ifndef LIBOS_ERR_RET_MEMORY_NOT_NULL
 
 /**
  * @brief Checks if the pointer is NULL or not; if it is, return LIBOS_ERR_NO_MEM.
@@ -112,8 +112,8 @@
  * 
  * @param ptr The value to check for NULL
  */
-#define LIBOS_ERR_RET_MEMORY_NOT_NUL(ptr) LIBOS_ERR_RET_ON_TRUE(((ptr) == NULL), LIBOS_ERR_NO_MEM)
-#endif // LIBOS_ERR_RET_MEMORY_NOT_NUL
+#define LIBOS_ERR_RET_MEMORY_NOT_NULL(ptr) LIBOS_ERR_RET_ON_TRUE(((ptr) == NULL), LIBOS_ERR_NO_MEM)
+#endif // LIBOS_ERR_RET_MEMORY_NOT_NULL
 
 #ifndef LIBOS_ERR_RET_ON_TRUE
 
@@ -132,7 +132,7 @@
 //
 // ================================================
 
-#ifndef LIBOS_ERR_RET_VOID_ARG_IN_RANGE
+#ifndef LIBOS_RET_VAL_ARG_IN_RANGE
 
 /**
  * @brief Checks if the argument is within the given range and function returns if it isn't.
@@ -140,11 +140,12 @@
  * @param value The value to do the range check on (WARNING: multiple evaluation of this are happening within the macro).
  * @param range_min The minimum number @ref value has to be (inclusive).
  * @param range_max The maximum number @ref value can be (inclusive).
+ * @param ret The optional return value (can be left empty to 'return' void).
  */
-#define LIBOS_ERR_RET_VOID_ARG_IN_RANGE(value, range_min, range_max) LIBOS_ERR_RET_VOID_ON_TRUE(((value) < (range_min) || (value) > (range_max)))
-#endif // LIBOS_ERR_RET_VOID_ARG_IN_RANGE
+#define LIBOS_RET_VAL_ARG_IN_RANGE(value, range_min, range_max, ret) LIBOS_RET_VAL_ON_TRUE(((value) < (range_min) || (value) > (range_max)), ret)
+#endif // LIBOS_RET_VAL_ARG_IN_RANGE
 
-#ifndef LIBOS_ERR_RET_VOID_ARG_NOT_NUL
+#ifndef LIBOS_RET_VAL_NOT_NULL
 
 /**
  * @brief Checks if the argument is not null, and if it is, returns.
@@ -152,34 +153,31 @@
  * @details
  * This function should be specifically used for arguments that are already given. If you 
  * want to check a memory allocation from something like malloc(), use
- * @ref LIBOS_ERR_RET_VOID_MEMORY_NOT_NULL.
+ * @ref LIBOS_RET_VAL_MEMORY_NOT_NULL.
  * 
  * @param arg The expression to evaluate and check if it is NULL or not.
+ * @param ret The optional return value (can be left empty to 'return' void).
  */
-#define LIBOS_ERR_RET_VOID_ARG_NOT_NUL(arg) LIBOS_ERR_RET_VOID_ON_TRUE((arg) == NULL)
-#endif // LIBOS_ERR_RET_VOID_ARG_NOT_NUL
+#define LIBOS_RET_VAL_NOT_NULL(arg, ret) LIBOS_RET_VAL_ON_TRUE((arg) == NULL, ret)
+#endif // LIBOS_RET_VAL_NOT_NULL
 
-#ifndef LIBOS_ERR_RET_VOID_MEMORY_NOT_NUL
+#ifndef LIBOS_RET_VAL_ON_TRUE
 
 /**
- * @brief Checks if the pointer is NULL or not; if it is, returns.
- * 
+ * @brief Returns if the @ref condition evaluates to true. The return value can be left empty (to 'return' void).
+ *
  * @details
- * This check should be used when the given argument is a pointer just returned from a function like malloc().
- * 
- * @param ptr The value to check for NULL
- */
-#define LIBOS_ERR_RET_VOID_MEMORY_NOT_NUL(ptr) LIBOS_ERR_RET_VOID_ON_TRUE(((ptr) == NULL))
-#endif // LIBOS_ERR_RET_VOID_MEMORY_NOT_NUL
-
-#ifndef LIBOS_ERR_RET_VOID_ON_TRUE
-
-/**
- * @brief Returns if the @ref condition evaluates to true.
+ * Empty macro arguments are only defined in version C99 and C++98 and
+ * higher. Older versions/compilers might have issues compiling this
+ * code.
+ * In the macro itself, the value for ret is on purpose left empty. This
+ * allows the case where the return is in a void function and nothing
+ * should be returned.
  * 
  * @param condition The expression to evaluate.
+ * @param ret The optional return value (can be left empty to 'return' void).
  */
-#define LIBOS_ERR_RET_VOID_ON_TRUE(condition) do { if ((condition)) { return; }} while(0)
-#endif // LIBOS_ERR_RET_VOID_ON_TRUE
+#define LIBOS_RET_VAL_ON_TRUE(condition, ret) do { if ((condition)) { return ret; }} while(0)
+#endif // LIBOS_RET_VAL_ON_TRUE
 
 #endif // LIBOS_ERROR_H
