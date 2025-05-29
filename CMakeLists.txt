@@ -32,3 +32,8 @@ endif()
 convert_option_to_definition(libOS-api LIBOS_MUTEX_ENABLE_RECURSIVE LIBOS_MUTEX_ENABLE_RECURSIVE)
 convert_option_to_definition(libOS-api LIBOS_MUTEX_ENABLE_DYNAMIC_ALLOCATION LIBOS_MUTEX_ENABLE_DYNAMIC_ALLOCATION)
 convert_option_to_definition(libOS-api LIBOS_MUTEX_ENABLE_STATIC_ALLOCATION LIBOS_MUTEX_ENABLE_STATIC_ALLOCATION)
+
+if (${BUILD_TESTING})
+    enable_testing()
+    add_subdirectory(tests)
+endif()
