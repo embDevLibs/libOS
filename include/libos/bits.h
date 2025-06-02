@@ -81,6 +81,22 @@
 #define HAS_MASK(value, mask) ((GET_MASK(value, mask) == (mask)) && ((mask) != 0))
 #endif
 
+
+#ifndef ONLY_MASK
+
+/**
+ * @brief Checks if the value has the ONLY masked bit(s) set (and all the masked bits, none can be missing).
+ * 
+ * @param value The value to check the mask on.
+ * @param flag_pos The mask to check for in the value.
+ * 
+ * @return true if the mask are the the only bit(s) is set.
+ * @return false if the mask are NOT the the only bit(s) is set.
+ *
+ */
+#define ONLY_MASK(value, mask) ( ((GET_MASK(value, mask) == (mask)) && (((value) & (mask)) == (value))) )
+#endif
+
 #ifndef HAS_FLAG
 
 /**
@@ -94,6 +110,21 @@
  *
  */
 #define HAS_FLAG(value, flag_pos) (HAS_MASK(value, 1 << flag_pos))
+#endif
+
+#ifndef ONLY_FLAG
+
+/**
+ * @brief Checks if the value has the ONLY bit index set.
+ * 
+ * @param value The value to check the bit flag on.
+ * @param flag_pos The index (0-based) of the bit to check.
+ * 
+ * @return true if this is the only bit is set.
+ * @return false if is NOT the only bit is set.
+ *
+ */
+#define ONLY_FLAG(value, flag_pos) ( (HAS_FLAG(value, flag_pos) && (((value) & (1 << (flag_pos))) == (value))) )
 #endif
 
 #ifndef SET_MASK

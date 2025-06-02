@@ -52,6 +52,54 @@ CTEST(bits_HAS_MASK, zeroMask)
 
 // ====================
 //
+// ONLY_MASK
+//
+// ====================
+
+CTEST(bits_ONLY_MASK, noBitsInMaskOrValue)
+{
+    const uint8_t kValue = 0;
+    const uint8_t kMask  = 0;
+    ASSERT_TRUE(ONLY_MASK(kValue, kMask));
+}
+
+CTEST(bits_ONLY_MASK, bitsInMaskButNotInValue)
+{
+    const uint8_t kValue = 0;
+    const uint8_t kMask  = 0b1100;
+    ASSERT_FALSE(ONLY_MASK(kValue, kMask));
+}
+
+CTEST(bits_ONLY_MASK, bitsInMaskAndInValue)
+{
+    const uint8_t kValue = 0b1100;
+    const uint8_t kMask  = 0b1100;
+    ASSERT_TRUE(ONLY_MASK(kValue, kMask));
+}
+
+CTEST(bits_ONLY_MASK, bitsInMaskMismatchedWithValue)
+{
+    const uint8_t kValue = 0b0100;
+    const uint8_t kMask  = 0b1100;
+    ASSERT_FALSE(ONLY_MASK(kValue, kMask));
+}
+
+CTEST(bits_ONLY_MASK, bitsInMaskAndBelowMaskInValue)
+{
+    const uint8_t kValue = 0b01100;
+    const uint8_t kMask  = 0b01101;
+    ASSERT_FALSE(ONLY_MASK(kValue, kMask));
+}
+
+CTEST(bits_ONLY_MASK, bitsInMaskAndAboveMaskInValue)
+{
+    const uint8_t kValue = 0b11100;
+    const uint8_t kMask  = 0b01100;
+    ASSERT_FALSE(ONLY_MASK(kValue, kMask));
+}
+
+// ====================
+//
 // HAS_FLAG
 //
 // ====================
@@ -75,6 +123,33 @@ CTEST(bits_HAS_FLAG, hasValueFlagZero)
     const uint8_t kValue = 0b10101010;
     const uint8_t kPos   = 0;
     ASSERT_FALSE(HAS_FLAG(kValue, kPos));
+}
+
+// ====================
+//
+// ONLY_FLAG
+//
+// ====================
+
+CTEST(bits_ONLY_FLAG, hasMoreValueBesidesFlag)
+{
+    const uint8_t kValue = 0b10101010;
+    const uint8_t kPos   = 1;
+    ASSERT_FALSE(ONLY_FLAG(kValue, kPos));
+}
+
+CTEST(bits_ONLY_FLAG, hasMoreValueAndNoFlag)
+{
+    const uint8_t kValue = 0b10101000;
+    const uint8_t kPos   = 1;
+    ASSERT_FALSE(ONLY_FLAG(kValue, kPos));
+}
+
+CTEST(bits_ONLY_FLAG, hasValueOnlyFlag)
+{
+    const uint8_t kValue = 0b010;
+    const uint8_t kPos   = 1;
+    ASSERT_TRUE(ONLY_FLAG(kValue, kPos));
 }
 
 // ====================
