@@ -1,5 +1,7 @@
-cmake_minimum_required(VERSION 3.20)
-project(libOS-api C)
+if (PROJECT_IS_TOP_LEVEL)
+    cmake_minimum_required(VERSION 3.20)
+    project(libOS-api C)
+endif()
 
 # By default, all features off. This will very clearly signal to the user that something is wrong. In other words:
 # they forgot to initialize the options of the libOS library.
