@@ -1,0 +1,4 @@
+version: "0.0.1"
+description: "A OS operation abstraction layer to unify the API across several platforms."
+url: "https://github.com/embDevLibs/libOS"
+license: "MIT"

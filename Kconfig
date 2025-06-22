@@ -1,0 +1,13 @@
+
+config LIBOS_MUTEX_ENABLE_RECURSIVE
+    bool "Enable recursive mutexes"
+    default ON
+
+config LIBOS_MUTEX_ENABLE_DYNAMIC_ALLOCATION
+    bool "Enable dynamic allocation of structures using malloc/free"
+    default ON
+
+config LIBOS_MUTEX_ENABLE_STATIC_ALLOCATION
+    bool "Enable static allocation of structures"
+    default ON
+
