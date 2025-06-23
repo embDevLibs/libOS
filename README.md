@@ -10,6 +10,20 @@ This is why, besides bare metal, also desktop platform(s) should be supported.
 Each API is extensively documented in it's header file.
 This is in Doxygen format to support the automatic generation of documentation pages.
 
+# Usage
+This implementation can be used in two ways.
+One is by using the pure CMake system.
+This is by using FetchContent, or ExternalProject or just a plain git submodule with add_subdirectory to fetch the sources.
+Make sure that if you need to setup any configuration (ie `LIBOS_MUTEX_ENABLE_DYNAMIC_ALLOCATION`), you pass this along using the correct mechanism.
+Then, when added to cmake, you can just use the target 'libSO' to link against.
+A copy of libOS will be downloaded using FetchContent if the libOS target isn't already present.
+
+The second method is by the using the IDF Component manager from Espressif.
+This method is aimed specifically as the ESP-IDF development ecosystem.
+You can use the regular dependency system to get your copy of the library.
+Configurations, like enable/disabling dynamic allocation can be done using menuconfig functionality of ESP-IDF.
+Make sure that they are properly configured for the platform implementation that you are using.
+
 # Implementation
 The OS abstraction library implementation is meant to be link-time provided.
 There is no native option to change the implementation during runtime.
