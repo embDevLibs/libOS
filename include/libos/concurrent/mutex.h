@@ -74,8 +74,8 @@
  */
 
 #pragma once
-#ifndef LIBOS_CONCURRENCY_MUTEX_H
-#define LIBOS_CONCURRENCY_MUTEX_H
+#ifndef LIBOS_CONCURRENT_MUTEX_H
+#define LIBOS_CONCURRENT_MUTEX_H
 
 #include "libos/error.h"
 #include "libos/time.h"
@@ -302,4 +302,4 @@ libos_err_t libos_mutex_create_recursive_static(libos_mutex_t *mutex, libos_mute
  */
 void libos_mutex_delete(libos_mutex_handle_t handle);
 
-#endif // LIBOS_CONCURRENCY_MUTEX_H
+#endif // LIBOS_CONCURRENT_MUTEX_H
