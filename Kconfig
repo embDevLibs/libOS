@@ -1,13 +1,16 @@
+config LIBOS_ENABLE_TESTING
+    bool "Enable unit tests"
+    default n
 
 config LIBOS_MUTEX_ENABLE_RECURSIVE
     bool "Enable recursive mutexes"
-    default ON
+    default y
 
 config LIBOS_MUTEX_ENABLE_DYNAMIC_ALLOCATION
     bool "Enable dynamic allocation of structures using malloc/free"
-    default ON
+    default y
 
 config LIBOS_MUTEX_ENABLE_STATIC_ALLOCATION
     bool "Enable static allocation of structures"
-    default ON
+    default y
 

@@ -25,7 +25,7 @@ convert_config_to_target(LIBOS_MUTEX_ENABLE_RECURSIVE)
 convert_config_to_target(LIBOS_MUTEX_ENABLE_DYNAMIC_ALLOCATION)
 convert_config_to_target(LIBOS_MUTEX_ENABLE_STATIC_ALLOCATION)
 
-if (${BUILD_TESTING})
+if (${CONFIG_LIBOS_ENABLE_TESTING})
     enable_testing()
     add_subdirectory(tests)
 endif()

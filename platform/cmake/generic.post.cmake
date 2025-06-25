@@ -1,4 +1,5 @@
 # By default, all features on. This is what the most generic situation support usually.
+option(LIBOS_ENABLE_TESTING "Enable unit tests" OFF)
 option(LIBOS_MUTEX_ENABLE_RECURSIVE "Enable recursive mutexes" ON)
 option(LIBOS_MUTEX_ENABLE_DYNAMIC_ALLOCATION "Enable dynamic allocation of structures using malloc/free" ON)
 option(LIBOS_MUTEX_ENABLE_STATIC_ALLOCATION "Enable static allocation of structures" ON)
@@ -29,7 +30,7 @@ convert_option_to_definition(${PROJECT_NAME} LIBOS_MUTEX_ENABLE_RECURSIVE LIBOS_
 convert_option_to_definition(${PROJECT_NAME} LIBOS_MUTEX_ENABLE_DYNAMIC_ALLOCATION LIBOS_MUTEX_ENABLE_DYNAMIC_ALLOCATION)
 convert_option_to_definition(${PROJECT_NAME} LIBOS_MUTEX_ENABLE_STATIC_ALLOCATION LIBOS_MUTEX_ENABLE_STATIC_ALLOCATION)
 
-if (${BUILD_TESTING})
+if (${LIBOS_ENABLE_TESTING})
     enable_testing()
     add_subdirectory(tests)
 endif()
