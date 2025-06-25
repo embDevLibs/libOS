@@ -12,7 +12,7 @@ endif()
 
 
 if (${LIBOS_PROJECT})
-    project(libOS)
+    project(libOS C)
 endif()
 
 #
