@@ -8,9 +8,6 @@ set(LIBOS_SRCS
 idf_component_register(SRCS ${LIBOS_SRCS}
                        INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
-# Just in case plain cmake is used somewhere else, give it an alias for the 'regular' name.
-add_library(libOS ALIAS ${COMPONENT_LIB})
-
 if (NOT COMMAND convert_config_to_target)
     function(convert_config_to_target var_name)
         if ("${CONFIG_${var_name}}" STREQUAL "y")
