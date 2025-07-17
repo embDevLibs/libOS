@@ -14,10 +14,8 @@ set(LIBOS_SRCS
 add_library(${PROJECT_NAME} INTERFACE ${LIBOS_SRCS})
 target_include_directories(${PROJECT_NAME} INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
-if (COMMAND convert_option_to_definition)
-    # Hope they have the same signature....
-else()
-    function(convert_option_to_definition target cmake_var macro_name)
+if (NOT COMMAND libos_option_to_definition)
+    function(libos_option_to_definition target cmake_var macro_name)
         if (${cmake_var})
             target_compile_definitions(${target} INTERFACE ${macro_name}=1)
         else()
@@ -26,9 +24,9 @@ else()
     endfunction()
 endif()
 
-convert_option_to_definition(${PROJECT_NAME} LIBOS_MUTEX_ENABLE_RECURSIVE LIBOS_MUTEX_ENABLE_RECURSIVE)
-convert_option_to_definition(${PROJECT_NAME} LIBOS_MUTEX_ENABLE_DYNAMIC_ALLOCATION LIBOS_MUTEX_ENABLE_DYNAMIC_ALLOCATION)
-convert_option_to_definition(${PROJECT_NAME} LIBOS_MUTEX_ENABLE_STATIC_ALLOCATION LIBOS_MUTEX_ENABLE_STATIC_ALLOCATION)
+libos_option_to_definition(${PROJECT_NAME} LIBOS_MUTEX_ENABLE_RECURSIVE LIBOS_MUTEX_ENABLE_RECURSIVE)
+libos_option_to_definition(${PROJECT_NAME} LIBOS_MUTEX_ENABLE_DYNAMIC_ALLOCATION LIBOS_MUTEX_ENABLE_DYNAMIC_ALLOCATION)
+libos_option_to_definition(${PROJECT_NAME} LIBOS_MUTEX_ENABLE_STATIC_ALLOCATION LIBOS_MUTEX_ENABLE_STATIC_ALLOCATION)
 
 if (${LIBOS_ENABLE_TESTING})
     enable_testing()
