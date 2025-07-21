@@ -52,6 +52,8 @@
 #ifndef LIBOS_BITS_H
 #define LIBOS_BITS_H
 
+#include <stdint.h>
+
 #include "libos/platform/bits.h"
 
 #ifndef GET_MASK
@@ -237,5 +239,109 @@
  */
 #define COMBINE_BYTES_32(lower, lower_middle, high_middle, higher) ((uint32_t)COMBINE_BYTES_16(lower, lower_middle) | ((uint32_t)COMBINE_BYTES_16(high_middle, higher) << 16))
 #endif
+
+#ifndef SET_16_IN_ARRAY
+
+/**
+ * @brief Sets the given 16 bits of data at @ref byte_offset in the @ref data memory.
+ *
+ * @details
+ * Be aware that this macro doesn't do any bounds checking on the array given
+ * to it. It is the users responsibility to ensure that data is written inside
+ * the allocated memory for the data.
+ *
+ * Note that the byte endianess is assumed to be correct for the current
+ * architecture. If the byte order of the data doesn't match the current
+ * architectures, the user should do a byte reordering operation on the
+ * 16-bit word before setting it.
+ *
+ * Whilst data, value and byte_offset are only evaluated once in the default
+ * implementation, this is not guaranteed for other platform implementations.
+ * 
+ * @param data The memory to place the data in.
+ * @param value The 16 bits of data to place in the memory.
+ * @param byte_offset The bytes in 8-bit words from the starting point of @ref data.
+ *
+ */
+#define SET_16_IN_ARRAY(data, value, byte_offset) (*((uint16_t*)((uint8_t*)((void*)data) + (size_t)(byte_offset))) = (value))
+#endif // SET_16_IN_ARRAY
+
+#ifndef SET_32_IN_ARRAY
+
+/**
+ * @brief Sets the given 32 bits of data at @ref byte_offset in the @ref data memory.
+ *
+ * @details
+ * Be aware that this macro doesn't do any bounds checking on the array given
+ * to it. It is the users responsibility to ensure that data is written inside
+ * the allocated memory for the data.
+ *
+ * Note that the byte endianess is assumed to be correct for the current
+ * architecture. If the byte order of the data doesn't match the current
+ * architectures, the user should do a byte reordering operation on the
+ * 32-bit word before setting it.
+ *
+ * Whilst data, value and byte_offset are only evaluated once in the default
+ * implementation, this is not guaranteed for other platform implementations.
+ * 
+ * @param data The memory to place the data in.
+ * @param value The 32 bits of data to place in the memory.
+ * @param byte_offset The bytes in 8-bit words from the starting point of @ref data.
+ *
+ */
+#define SET_32_IN_ARRAY(data, value, byte_offset) (*((uint32_t*)((uint8_t*)((void*)data) + (size_t)(byte_offset))) = (value))
+#endif // SET_32_IN_ARRAY
+
+#ifndef GET_16_IN_ARRAY
+
+/**
+ * @brief Retrieves the 16 bits of data at @ref byte_offset in the @ref data memory.
+ *
+ * @details
+ * Be aware that this macro doesn't do any bounds checking on the array given
+ * to it. It is the users responsibility to ensure that data is written inside
+ * the allocated memory for the data.
+ *
+ * Note that the byte endianess is assumed to be correct for the current
+ * architecture. If the byte order of the data doesn't match the current
+ * architectures, the user should do a byte reordering operation on the
+ * resulting 32-bit word.
+ *
+ * Whilst data and byte_offset are only evaluated once in the default
+ * implementation, this is not guaranteed for other platform implementations.
+ * 
+ * @param data The memory to place the data in.
+ * @param byte_offset The bytes in 8-bit words from the starting point of @ref data.
+ *
+ * @return uint16_t The 16-bit value at the given location.
+ */
+#define GET_16_IN_ARRAY(data, byte_offset) (*((uint16_t*)((uint8_t*)((void*)data) + (size_t)(byte_offset))))
+#endif // GET_16_IN_ARRAY
+
+#ifndef GET_32_IN_ARRAY
+
+/**
+ * @brief Retrieves the 16 bits of data at @ref byte_offset in the @ref data memory.
+ *
+ * @details
+ * Be aware that this macro doesn't do any bounds checking on the array given
+ * to it. It is the users responsibility to ensure that data is written inside
+ * the allocated memory for the data.
+ *
+ * Note that the byte endianess is assumed to be correct for the current
+ * architecture. If the byte order of the data doesn't match the current
+ * architectures, the user should do a byte reordering operation on the
+ * resulting 32-bit word.
+ *
+ * Whilst data and byte_offset are only evaluated once in the default
+ * implementation, this is not guaranteed for other platform implementations.
+ * 
+ * @param data The memory to place the data in.
+ * @param byte_offset The bytes in 8-bit words from the starting point of @ref data.
+ *
+ * @return uint16_t The 32-bit value at the given location.
+ */
+#define GET_32_IN_ARRAY(data, byte_offset) (*((uint32_t*)((uint8_t*)((void*)data) + (size_t)(byte_offset))))
+#endif // GET_32_IN_ARRAY
 
 #endif // LIBOS_BITS_H

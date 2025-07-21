@@ -25,5 +25,5 @@ set(SRCS
 
 add_executable(libos-testing ${SRCS})
 target_include_directories(libos-testing PUBLIC ./inc/)
-target_link_libraries(libos-testing PUBLIC libOS)
+target_link_libraries(libos-testing PUBLIC libos)
 target_link_libraries(libos-testing PRIVATE ctest)
