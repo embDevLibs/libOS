@@ -369,7 +369,7 @@ CTEST(bits_COMBINE_BYTES_16, simpleData)
 {
 	const uint8_t kValue1 = 0xAA;
 	const uint8_t kValue2 = 0x55;
-	const uint16_t kExpected = 0x55AA;
+	const uint16_t kExpected = 0xAA55;
 	const uint16_t kResultValue = COMBINE_BYTES_16(kValue1, kValue2);
 	ASSERT_EQUAL(kExpected, kResultValue);
 }
@@ -385,7 +385,7 @@ CTEST(bits_COMBINE_BYTES_32, simpleData)
 	const uint8_t kValue2 = 0x55;
 	const uint8_t kValue3 = 0x11;
 	const uint8_t kValue4 = 0xFF;
-	const uint32_t kExpected = 0xFF1155AA;
+	const uint32_t kExpected = 0xAA5511FF;
 	const uint32_t kResultValue = COMBINE_BYTES_32(kValue1, kValue2, kValue3, kValue4);
 	ASSERT_EQUAL(kExpected, kResultValue);
 }
@@ -438,8 +438,8 @@ CTEST(bits_SET_16_IN_ARRAY, largerDataThan16)
 
 	SET_16_IN_ARRAY(data, kValue, 1);
 	ASSERT_EQUAL(0x11, data[0]);
-	ASSERT_EQUAL(0xBB, data[1]);
-	ASSERT_EQUAL(0xDD, data[2]);
+	ASSERT_EQUAL(0xCC, data[1]);
+	ASSERT_EQUAL(0xAA, data[2]);
 	ASSERT_EQUAL(0x44, data[3]);
 }
 
@@ -569,4 +569,40 @@ CTEST(bits_GET_32_IN_ARRAY, simpleData)
   SET_32_IN_ARRAY(data, kValue, 3);
 
   ASSERT_EQUAL(kValue, GET_32_IN_ARRAY(data, 3));
+}
+
+// ====================
+//
+// REVERSE_BYTES_IN_ARRAY_16BIT
+//
+// ====================
+CTEST(bits_REVERSE_BYTES_16, simpleData)
+{
+  uint8_t data[4] = { 0xAA, 0xBB, 0xCC, 0xDD };
+  
+  REVERSE_BYTES_IN_ARRAY_16BIT(data, 1);
+
+  ASSERT_EQUAL(0xAA, data[0]);
+  ASSERT_EQUAL(0xCC, data[1]);
+  ASSERT_EQUAL(0xBB, data[2]);
+  ASSERT_EQUAL(0xDD, data[3]);
+}
+
+// ====================
+//
+// REVERSE_BYTES_IN_ARRAY_32BIT
+//
+// ====================
+CTEST(bits_REVERSE_BYTES_32, simpleData)
+{
+  uint8_t data[8] = { 0xAA, 0xBB, 0xCC, 0xDD, 0x11, 0x22 };
+  
+  REVERSE_BYTES_IN_ARRAY_32BIT(data, 1);
+
+  ASSERT_EQUAL(0xAA, data[0]);
+  ASSERT_EQUAL(0x11, data[1]);
+  ASSERT_EQUAL(0xDD, data[2]);
+  ASSERT_EQUAL(0xCC, data[3]);
+  ASSERT_EQUAL(0xBB, data[4]);
+  ASSERT_EQUAL(0x22, data[5]);
 }

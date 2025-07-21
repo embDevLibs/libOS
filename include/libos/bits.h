@@ -6,9 +6,16 @@
  * This header provides some macros that are commonly used for bit
  * manipulation. These utilities help write some more expressive code but also
  * help prevent some common mistakes that are made when doing bit manipulation.
- * A platform can provide a specific implementation that is optimized for the
- * architecture that it is running on. This header just provides a generic, as
- * portable as reasonably possible, default implementation. A implementation
+ * 
+ * The default implementations of the multi-byte macros do assume that the
+ * output should be big-endian. This can be reversed with some other macros
+ * that convert between the 2 orders.
+ * A platform must override these macros if the usual bit operators don't yield
+ * the usual result of where the more left bits are more significant.
+ *
+ * A platform can also provide a specific implementation that is optimized for
+ * the architecture that it is running on. This header just provides a generic,
+ * as portable as reasonably possible, default implementation. A implementation
  * may NOT implement these operations as functions. This would mean that it
  * would not be possible to use these macros for static initialisation of data.
  *
@@ -242,26 +249,34 @@
 
 /**
  * @brief Combines the given two bytes into a unsigned 16 bit integer.
+ *
+ * @details
+ * The data entry for the parameters is like entering a big endian number. This
+ * is usually how larger number are also written.
  * 
- * @param lower The least significant byte of the uint16.
  * @param higher The most significant byte of the uint16.
+ * @param lower The least significant byte of the uint16.
  * 
  */
-#define COMBINE_BYTES_16(lower, higher) (((uint16_t)(lower)) | (((uint16_t)(higher)) << 8))
+#define COMBINE_BYTES_16(higher, lower) (((uint16_t)(lower)) | (((uint16_t)(higher)) << 8))
 #endif
 
 #ifndef COMBINE_BYTES_32
 
 /**
  * @brief Combines the given 4 four bytes into a 32 bit unsigned integer.
+ *
+ * @details
+ * The data entry for the parameters is like entering a big endian number. This
+ * is usually how larger number are also written.
  * 
- * @param lower The least significant byte of the uint32.
- * @param lower_middle The least significant byte of the two middle bytes of the uint32 (bit 8-15).
- * @param higher_middle The most byte of the two middle bytes of the uint32 (bit 16-23).
  * @param higher The most significant byte of the uint32.
+ * @param higher_middle The most byte of the two middle bytes of the uint32 (bit 16-23).
+ * @param lower_middle The least significant byte of the two middle bytes of the uint32 (bit 8-15).
+ * @param lower The least significant byte of the uint32.
  * 
  */
-#define COMBINE_BYTES_32(lower, lower_middle, high_middle, higher) ((uint32_t)COMBINE_BYTES_16(lower, lower_middle) | ((uint32_t)COMBINE_BYTES_16(high_middle, higher) << 16))
+#define COMBINE_BYTES_32(higher, higher_middle, lower_middle, lower) ((uint32_t)COMBINE_BYTES_16(lower_middle, lower) | ((uint32_t)COMBINE_BYTES_16(higher, higher_middle) << 16))
 #endif
 
 #ifndef SET_16_IN_ARRAY
@@ -274,10 +289,10 @@
  * to it. It is the users responsibility to ensure that data is written inside
  * the allocated memory for the data.
  *
- * Note that the byte endianess is assumed to be correct for the current
- * architecture. If the byte order of the data doesn't match the current
- * architectures, the user should do a byte reordering operation on the
- * 16-bit word before setting it.
+ * Note that the byte endianess of @ref data is assumed to be big endian
+ * because this macro focuses on 'exporting' data is it where. Which is usually
+ * big-endian. If this is not the correct end ordering, the user should do a
+ * byte reordering to little-endian.
  *
  * Whilst data, value and byte_offset are only evaluated once in the default
  * implementation, this is not guaranteed for other platform implementations.
@@ -287,7 +302,11 @@
  * @param byte_offset The bytes in 8-bit words from the starting point of @ref data.
  *
  */
-#define SET_16_IN_ARRAY(data, value, byte_offset) (*((uint16_t*)((uint8_t*)((void*)data) + (size_t)(byte_offset))) = (value))
+#define SET_16_IN_ARRAY(data, value, byte_offset) do {                                                                           \
+                                                    uint16_t __val = (value);                                                     \
+                                                    (*((uint8_t*)(data) + (size_t)((byte_offset) + 0)) = ((__val >>  8) & 0xFF)); \
+                                                    (*((uint8_t*)(data) + (size_t)((byte_offset) + 1)) = ((__val >>  0) & 0xFF)); \
+                                                  } while(0)
 #endif // SET_16_IN_ARRAY
 
 #ifndef SET_32_IN_ARRAY
@@ -300,10 +319,10 @@
  * to it. It is the users responsibility to ensure that data is written inside
  * the allocated memory for the data.
  *
- * Note that the byte endianess is assumed to be correct for the current
- * architecture. If the byte order of the data doesn't match the current
- * architectures, the user should do a byte reordering operation on the
- * 32-bit word before setting it.
+ * Note that the byte endianess of @ref data is assumed to be big endian
+ * because this macro focuses on 'exporting' data is it where. Which is usually
+ * big-endian. If this is not the correct end ordering, the user should do a
+ * byte reordering to little-endian.
  *
  * Whilst data, value and byte_offset are only evaluated once in the default
  * implementation, this is not guaranteed for other platform implementations.
@@ -313,7 +332,14 @@
  * @param byte_offset The bytes in 8-bit words from the starting point of @ref data.
  *
  */
-#define SET_32_IN_ARRAY(data, value, byte_offset) (*((uint32_t*)((uint8_t*)((void*)data) + (size_t)(byte_offset))) = (value))
+#define SET_32_IN_ARRAY(data, value, byte_offset) do {                                                            \
+                                                    uint32_t __val = (value);                                     \
+                                                    uint8_t *__data = ((uint8_t*)(data) + (size_t)(byte_offset)); \
+                                                    *(__data + 0) = ((__val >> 24) & 0xFF);                       \
+                                                    *(__data + 1) = ((__val >> 16) & 0xFF);                       \
+                                                    *(__data + 2) = ((__val >>  8) & 0xFF);                       \
+                                                    *(__data + 3) = ((__val >>  0) & 0xFF);                       \
+                                                  } while(0)
 #endif // SET_32_IN_ARRAY
 
 #ifndef GET_16_IN_ARRAY
@@ -326,20 +352,23 @@
  * to it. It is the users responsibility to ensure that data is written inside
  * the allocated memory for the data.
  *
- * Note that the byte endianess is assumed to be correct for the current
- * architecture. If the byte order of the data doesn't match the current
- * architectures, the user should do a byte reordering operation on the
- * resulting 32-bit word.
+ * Note that the byte endianess of @ref data is assumed to be big endian
+ * because this macro focuses on 'exporting' data is it where. Which is usually
+ * big-endian. If this is not the correct end ordering, the user should do a
+ * byte reordering to little-endian.
  *
  * Whilst data and byte_offset are only evaluated once in the default
  * implementation, this is not guaranteed for other platform implementations.
  * 
- * @param data The memory to place the data in.
+ * @param data The memory to retrieve the data from.
  * @param byte_offset The bytes in 8-bit words from the starting point of @ref data.
  *
  * @return uint16_t The 16-bit value at the given location.
  */
-#define GET_16_IN_ARRAY(data, byte_offset) (*((uint16_t*)((uint8_t*)((void*)data) + (size_t)(byte_offset))))
+#define GET_16_IN_ARRAY(data, byte_offset) ((uint16_t)(  \
+                                             ((uint16_t)(*(((uint8_t*)data) + (size_t)((byte_offset) + 0))) << 8) | \
+                                             ((uint16_t)(*(((uint8_t*)data) + (size_t)((byte_offset) + 1))) << 0)   \
+                                           ))
 #endif // GET_16_IN_ARRAY
 
 #ifndef GET_32_IN_ARRAY
@@ -352,20 +381,62 @@
  * to it. It is the users responsibility to ensure that data is written inside
  * the allocated memory for the data.
  *
- * Note that the byte endianess is assumed to be correct for the current
- * architecture. If the byte order of the data doesn't match the current
- * architectures, the user should do a byte reordering operation on the
- * resulting 32-bit word.
+ * Note that the byte endianess of @ref data is assumed to be big endian
+ * because this macro focuses on 'exporting' data is it where. Which is usually
+ * big-endian. If this is not the correct end ordering, the user should do a
+ * byte reordering to little-endian.
  *
  * Whilst data and byte_offset are only evaluated once in the default
  * implementation, this is not guaranteed for other platform implementations.
  * 
- * @param data The memory to place the data in.
+ * @param data The memory to retrieve the data from.
  * @param byte_offset The bytes in 8-bit words from the starting point of @ref data.
  *
  * @return uint16_t The 32-bit value at the given location.
  */
-#define GET_32_IN_ARRAY(data, byte_offset) (*((uint32_t*)((uint8_t*)((void*)data) + (size_t)(byte_offset))))
+#define GET_32_IN_ARRAY(data, byte_offset) ((uint32_t)(  \
+                                             ((uint32_t)(*(((uint8_t*)data) + (size_t)((byte_offset) + 0))) << 24) | \
+                                             ((uint32_t)(*(((uint8_t*)data) + (size_t)((byte_offset) + 1))) << 16) | \
+                                             ((uint32_t)(*(((uint8_t*)data) + (size_t)((byte_offset) + 2))) << 8)  | \
+                                             ((uint32_t)(*(((uint8_t*)data) + (size_t)((byte_offset) + 3))) << 0)    \
+                                           ))
 #endif // GET_32_IN_ARRAY
+
+#ifndef REVERSE_BYTES_IN_ARRAY_16BIT
+
+/**
+ * @brief Reverse the two bytes in the 16 bit word.
+ * 
+ * @param data The memory to swap the bytes in.
+ * @param byte_offset The bytes in the 8-bit words from the starting point of @ref data.
+ * 
+ */
+#define REVERSE_BYTES_IN_ARRAY_16BIT(data, byte_offset) do {                                                            \
+                                                          uint8_t *__data = ((uint8_t*)(data) + (size_t)(byte_offset)); \
+                                                          uint8_t __temp = *__data;                                     \
+                                                          *(__data + 0) = *(__data + 1);                                \
+                                                          *(__data + 1) = __temp;                                       \
+                                                        } while(0)
+#endif // REVERSE_BYTES_IN_ARRAY_16BIT
+
+#ifndef REVERSE_BYTES_IN_ARRAY_32BIT
+
+/**
+ * @brief Reverse the order of the four bytes in the 32 bit word.
+ * 
+ * @param data The memory to swap the bytes in.
+ * @param byte_offset The bytes in the 8-bit words from the starting point of @ref data.
+ * 
+ */
+#define REVERSE_BYTES_IN_ARRAY_32BIT(data, byte_offset) do {                                                            \
+                                                          uint8_t *__data = ((uint8_t*)(data) + (size_t)(byte_offset)); \
+                                                          uint8_t __temp = *(__data + 0);                               \
+                                                          *(__data + 0) = *(__data + 3);                                \
+                                                          *(__data + 3) = __temp;                                       \
+                                                          __temp = *(__data + 1);                                       \
+                                                          *(__data + 1) = *(__data + 2);                                \
+                                                          *(__data + 2) = __temp;                                       \
+                                                        } while(0)
+#endif // REVERSE_BYTES_IN_ARRAY_32BIT
 
 #endif // LIBOS_BITS_H
