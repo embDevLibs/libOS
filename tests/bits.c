@@ -176,6 +176,28 @@ CTEST(bits_SET_MASK, setValueWithAlreadySet)
 
 // ====================
 //
+// CLEAR_MASK
+//
+// ====================
+CTEST(bits_CLEAR_MASK, clearValueOnZero)
+{
+	uint8_t value = 0x00;
+	const uint8_t kMask = 0b00111100;
+	CLEAR_MASK(value, kMask);
+	ASSERT_EQUAL(0, value);
+}
+
+CTEST(bits_CLEAR_MASK, setValueWithSetValue)
+{
+	uint8_t value = 0b10111101;
+	const uint8_t kMask = 0b10000001;
+	const uint8_t kExpected = 0b00111100;
+	CLEAR_MASK(value, kMask);
+	ASSERT_EQUAL(kExpected, value);
+}
+
+// ====================
+//
 // SET_FLAG
 //
 // ====================
@@ -192,6 +214,27 @@ CTEST(bits_SET_FLAG, setValueWithAlreadySet)
 	uint8_t value = 0b00111000;
 	const uint8_t kExpected = 0b00111010;
 	SET_FLAG(value, 1);
+	ASSERT_EQUAL(kExpected, value);
+}
+
+// ====================
+//
+// CLEAR_FLAG
+//
+// ====================
+CTEST(bits_CLEAR_FLAG, clearValueOnZero)
+{
+	uint8_t value = 0x00;
+	const uint8_t kExpected = 0b00000000;
+	CLEAR_FLAG(value, 1);
+	ASSERT_EQUAL(kExpected, value);
+}
+
+CTEST(bits_CLEAR_FLAG, clearValueWithSetFlag)
+{
+	uint8_t value = 0b00111010;
+	const uint8_t kExpected = 0b00111000;
+	CLEAR_FLAG(value, 1);
 	ASSERT_EQUAL(kExpected, value);
 }
 

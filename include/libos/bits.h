@@ -141,6 +141,18 @@
 #define SET_MASK(value, mask) ((value) = ((value) & ~(mask)) | (mask))
 #endif
 
+#ifndef CLEAR_MASK
+
+/**
+ * @brief Clears the bits in the value according to the mask.
+ * 
+ * @param value The value to set the mask in.
+ * @param mask The mask to set in the value.
+ * 
+ */
+#define CLEAR_MASK(value, mask) ((value) = ((value) & ~(mask)))
+#endif
+
 #ifndef SET_FLAG
 
 /**
@@ -151,6 +163,18 @@
  * 
  */
 #define SET_FLAG(value, flag_pos) (SET_MASK(value, (1 << flag_pos)))
+#endif
+
+#ifndef CLEAR_FLAG
+
+/**
+ * @brief Clears a given bit in the value.
+ * 
+ * @param value The value to set a bit in.
+ * @param flag_pos The index (0-based) of the bit to set in the value.
+ * 
+ */
+#define CLEAR_FLAG(value, flag_pos) (CLEAR_MASK(value, (1 << flag_pos)))
 #endif
 
 #ifndef SET_MASKED_VALUE
