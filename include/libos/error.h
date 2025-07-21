@@ -26,7 +26,7 @@
  * * LIBOS_ERR_NOTSUP
  * * LIBOS_ERR_BUSY
  * * LIBOS_ERR_TIMEOUT
- * * LIBOS_ERR_INVALID_STATE 
+ * * LIBOS_ERR_INVALID_STATE
  * 
  * Any additional helper macros can be defined but ideally should be
  * up-streamed to the general API if they are OS & platform independent.
@@ -69,9 +69,29 @@
 
 #include "libos/platform/error.h"
 
+#ifndef LIBOS_ERR_CHECK
+
+/**
+ * @brief Checks if the argument is LIBOS_ERR_OK, and if not, return that error value.
+ * 
+ * @param value The value to do the check on.
+ */
+#define LIBOS_ERR_CHECK(expr) do { libos_err_t __err = (expr); LIBOS_ERR_RET_ON_TRUE(__err != LIBOS_ERR_OK, __err); } while(0)
+#endif // LIBOS_ERR_CHECK
+
+#ifndef LIBOS_ERR_CHECK_VOID
+
+/**
+ * @brief Checks if the argument is LIBOS_ERR_OK, and if not, do a empty return (ie void).
+ * 
+ * @param value The value to do the check on.
+ */
+#define LIBOS_ERR_CHECK_VOID(expr) do { libos_err_t __err = (expr); LIBOS_RET_VAL_ON_TRUE(__err != LIBOS_ERR_OK,); } while(0)
+#endif // LIBOS_ERR_CHECK_VOID
+
 // ================================================
 //
-// Error handling that returns error codes.
+// Error handling that returns predefined error codes.
 //
 // ================================================
 
@@ -128,7 +148,7 @@
 
 // ================================================
 //
-// Error handling that just returns (for void).
+// Error handling that returns userdefined values (including void).
 //
 // ================================================
 
