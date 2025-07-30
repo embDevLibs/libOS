@@ -20,13 +20,15 @@
  * must result in a expression with the type libos_err_t:
  * 
  * * LIBOS_ERR_OK
- * * LIBOS_ERR_FAIL
- * * LIBOS_ERR_NO_MEM
- * * LIBOS_ERR_INVALID_ARG
- * * LIBOS_ERR_NOTSUP
- * * LIBOS_ERR_BUSY
- * * LIBOS_ERR_TIMEOUT
- * * LIBOS_ERR_INVALID_STATE
+ * * LIBOS_ERR_FAIL (general error)
+ * * LIBOS_ERR_NO_MEM (out of memory, failed to allocate)
+ * * LIBOS_ERR_INVALID_ARG (invalid function argument was given)
+ * * LIBOS_ERR_NOTSUP (not supported)
+ * * LIBOS_ERR_BUSY (resource busy)
+ * * LIBOS_ERR_TIMEOUT (operation timed out)
+ * * LIBOS_ERR_INVALID_STATE (object operated on is in a unsupported state)
+ * * LIBOS_ERR_INVALID_DATA (data provided is in incorrect)
+ * * LIBOS_ERR_IO (hardware error occurred)
  * 
  * Any additional helper macros can be defined but ideally should be
  * up-streamed to the general API if they are OS & platform independent.
